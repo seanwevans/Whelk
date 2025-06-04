@@ -11,18 +11,24 @@ Whelk is a secure password management application that leverages Microsoft SEAL'
 ## Requirements
 - .NET 6.0 or higher
 - Microsoft SEAL (Simple Encrypted Arithmetic Library)
-- Visual Studio or compatible C# IDE
+ - Visual Studio or the `dotnet` CLI
 
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/username/whelk.git
+    git clone https://github.com/seanwevans/Whelk.git
     ```
 2. Install Microsoft SEAL:
     ```bash
     dotnet add package Microsoft.Research.SEALNet
     ```
-3. Open the project in Visual Studio.
+3. Restore NuGet packages:
+    ```bash
+    nuget restore whelk.sln
+    # or
+    dotnet restore
+    ```
+4. Open the project in Visual Studio or build with `dotnet` CLI.
 
 ## Usage
 ### Running the Program
@@ -98,7 +104,7 @@ scale = Math.Pow(2.0, 40)
 - Adjust coefficient modulus to balance security and performance.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Contributions
 Contributions are welcome! Feel free to submit issues or pull requests to improve functionality or add features.

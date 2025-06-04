@@ -126,6 +126,7 @@ class Program
         Console.WriteLine($"Validation for user1 with incorrect password: {isInvalid}");
     }
 
+
     internal static void PasswordManagementExample(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
     {
         List<double> plaintextPassword = new List<double>
@@ -166,4 +167,5 @@ class Program
             Console.WriteLine($"Error during password management: {ex.Message}");
         }
     }
+
 }
