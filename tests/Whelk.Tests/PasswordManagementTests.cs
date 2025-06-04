@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Microsoft.Research.SEAL;
 using Xunit;
 
@@ -9,9 +8,7 @@ public class PasswordManagementTests
 {
     private static void ResetDatabase()
     {
-        var field = typeof(Program).GetField("passwordDatabase", BindingFlags.NonPublic | BindingFlags.Static);
-        var dict = (Dictionary<string, Ciphertext>)field.GetValue(null)!;
-        dict.Clear();
+        Program.ClearPasswordDatabase();
     }
 
     [Fact]
