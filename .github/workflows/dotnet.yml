@@ -1,0 +1,23 @@
+name: .NET
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Restore dependencies
+      run: dotnet restore whelk.sln
+    - name: Build main project
+      run: dotnet build whelk/whelk.csproj --configuration Release --no-restore
+    - name: Build test project
+      run: dotnet build tests/Whelk.Tests/Whelk.Tests.csproj --configuration Release --no-restore
+    - name: Run tests
+      run: dotnet test tests/Whelk.Tests/Whelk.Tests.csproj --no-build --configuration Release --verbosity normal
