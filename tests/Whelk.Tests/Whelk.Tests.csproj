@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\whelk\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\whelk\PasswordManager.cs" Link="PasswordManager.cs" />
   </ItemGroup>
 
 </Project>

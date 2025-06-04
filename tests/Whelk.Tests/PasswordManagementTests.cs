@@ -1,18 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Microsoft.Research.SEAL;
 using Xunit;
 
 public class PasswordManagementTests
 {
-    private static void ResetDatabase()
-    {
-        var field = typeof(Program).GetField("passwordDatabase", BindingFlags.NonPublic | BindingFlags.Static);
-        var dict = (Dictionary<string, Ciphertext>)field.GetValue(null)!;
-        dict.Clear();
-    }
 
     [Fact]
     public void SetupEncryptionParameters_ReturnsExpectedSettings()
@@ -25,19 +18,19 @@ public class PasswordManagementTests
     [Fact]
     public void EncodeEncryptDecrypt_RoundTripMaintainsData()
     {
-        ResetDatabase();
         var parms = Program.SetupEncryptionParameters(out double scale);
         using var context = new SEALContext(parms);
         var keys = Program.GenerateKeys(context);
         var encoder = new CKKSEncoder(context);
         var encryptor = new Encryptor(context, keys.PublicKey);
         var decryptor = new Decryptor(context, keys.SecretKey);
+        var manager = new PasswordManager(encoder, encryptor, decryptor, scale);
 
         List<double> pwd = new() {1,2,3,4,5};
-        var pt = Program.EncodePassword(encoder, pwd, scale);
-        var ct = Program.EncryptPassword(encryptor, pt);
-        var dpt = Program.DecryptPassword(decryptor, ct);
-        var decoded = Program.DecodePassword(encoder, dpt, pwd.Count);
+        var pt = manager.EncodePassword(pwd);
+        var ct = manager.EncryptPassword(pt);
+        var dpt = manager.DecryptPassword(ct);
+        var decoded = manager.DecodePassword(dpt, pwd.Count);
 
         Assert.Equal(pwd, decoded);
     }
@@ -45,26 +38,25 @@ public class PasswordManagementTests
     [Fact]
     public void ValidatePassword_WorksForCorrectAndIncorrectPasswords()
     {
-        ResetDatabase();
         var parms = Program.SetupEncryptionParameters(out double scale);
         using var context = new SEALContext(parms);
         var keys = Program.GenerateKeys(context);
         var encoder = new CKKSEncoder(context);
         var encryptor = new Encryptor(context, keys.PublicKey);
         var decryptor = new Decryptor(context, keys.SecretKey);
+        var manager = new PasswordManager(encoder, encryptor, decryptor, scale);
 
         List<double> pwd = new() {1,2,3,4,5};
-        Program.StorePassword("user", pwd, encoder, encryptor, scale);
+        manager.StorePassword("user", pwd);
 
-        Assert.True(Program.ValidatePassword("user", pwd, encoder, encryptor, decryptor, scale));
+        Assert.True(manager.ValidatePassword("user", pwd));
         var wrong = new List<double>{5,4,3,2,1};
-        Assert.False(Program.ValidatePassword("user", wrong, encoder, encryptor, decryptor, scale));
+        Assert.False(manager.ValidatePassword("user", wrong));
     }
 
     [Fact]
     public void PasswordManagementExample2_PrintsExpectedResults()
     {
-        ResetDatabase();
         var parms = Program.SetupEncryptionParameters(out double scale);
         using var context = new SEALContext(parms);
         var keys = Program.GenerateKeys(context);
