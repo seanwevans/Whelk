@@ -98,7 +98,7 @@ scale = Math.Pow(2.0, 40)
 - Adjust coefficient modulus to balance security and performance.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Contributions
 Contributions are welcome! Feel free to submit issues or pull requests to improve functionality or add features.
