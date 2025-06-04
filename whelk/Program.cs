@@ -124,44 +124,4 @@ class Program
         Console.WriteLine($"Validation for user1 with incorrect password: {isInvalid}");
     }
 
-    static void PasswordManagementExample(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
-    {
-        List<double> plaintextPassword = new List<double>
-        {
-            1, 2, 3, 4, 5, 67, 7, 8, 9, 10,
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-            1, 255, 35, 4, 5, 6, 7, 8, 9, 255,
-            1, 2, 3, 4, 15, 6, 7, 8, 9, 10,
-            1, 2, 3, 4, 5, 65, 7, 8, 9, 10,
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        };
-        Console.WriteLine($"Original:  {string.Join(" ", plaintextPassword)}");
-
-        try
-        {
-            // Encode
-            var plaintext = EncodePassword(encoder, plaintextPassword, scale);
-
-            // Encrypt
-            var encryptedPassword = EncryptPassword(encryptor, plaintext);
-
-            // Store or transfer the encrypted password
-            //Console.WriteLine($"Encrypted: {encryptedPassword}");
-
-            // Decrypt
-            var decryptedPassword = DecryptPassword(decryptor, encryptedPassword);
-
-            // Decode
-            var decodedPassword = DecodePassword(encoder, decryptedPassword, plaintextPassword.Count);
-
-            Console.Write("Decrypted: ");
-            var roundedPassword = decodedPassword.Select(n => Math.Round(n)).ToList();
-            Console.WriteLine(string.Join(" ", roundedPassword));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during password management: {ex.Message}");
-        }
-    }
 }
