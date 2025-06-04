@@ -3,7 +3,6 @@ using Microsoft.Research.SEAL;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 
 class Program
 {
