@@ -2,6 +2,8 @@
 
 Whelk is a secure password management application that leverages Microsoft SEAL's CKKS homomorphic encryption to perform password operations without exposing sensitive data in plaintext. This project demonstrates encoding, encryption, decryption, and validation of passwords using fully homomorphic encryption (FHE).
 
+This project targets the .NET 6 runtime.
+
 ## Features
 - **Homomorphic Encryption**: Protects passwords using CKKS encryption scheme.
 - **Secure Storage**: Passwords are stored in encrypted form, preventing direct access to plaintext data.
@@ -9,7 +11,7 @@ Whelk is a secure password management application that leverages Microsoft SEAL'
 - **Performance Monitoring**: Tracks execution time for performance evaluation.
 
 ## Requirements
-- .NET 6.0 or higher
+- .NET 6 SDK or higher
 - Microsoft SEAL (Simple Encrypted Arithmetic Library)
 - Visual Studio or compatible C# IDE
 
