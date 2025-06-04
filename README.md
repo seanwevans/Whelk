@@ -32,6 +32,12 @@ This project targets the .NET 6 runtime.
     ```
 4. Open the project in Visual Studio or build with `dotnet` CLI.
 
+## Running Tests
+Ensure the .NET 6 SDK is installed, then execute all tests with:
+```bash
+dotnet test
+```
+
 ## Usage
 ### Running the Program
 To execute the program, build and run the `Program.cs` file.
