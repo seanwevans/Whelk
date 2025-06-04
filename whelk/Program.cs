@@ -9,6 +9,7 @@ class Program
 {
     static Dictionary<string, Ciphertext> passwordDatabase = new Dictionary<string, Ciphertext>();
 
+#if !EXCLUDE_MAIN
     static void Main(string[] args)
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -36,8 +37,9 @@ class Program
         Console.WriteLine($"Execution time: {stopwatch.ElapsedMilliseconds}ms");
         Console.ReadLine();
     }
+#endif
 
-    static EncryptionParameters SetupEncryptionParameters(out double scale)
+    internal static EncryptionParameters SetupEncryptionParameters(out double scale)
     {
         var parms = new EncryptionParameters(SchemeType.CKKS)
         {
@@ -48,7 +50,7 @@ class Program
         return parms;
     }
 
-    static (PublicKey PublicKey, SecretKey SecretKey) GenerateKeys(SEALContext context)
+    internal static (PublicKey PublicKey, SecretKey SecretKey) GenerateKeys(SEALContext context)
     {
         var keygen = new KeyGenerator(context);
         var secretKey = keygen.SecretKey;
@@ -56,40 +58,40 @@ class Program
         return (publicKey, secretKey);
     }
 
-    static Plaintext EncodePassword(CKKSEncoder encoder, List<double> plaintextPassword, double scale)
+    internal static Plaintext EncodePassword(CKKSEncoder encoder, List<double> plaintextPassword, double scale)
     {
         var plaintext = new Plaintext();
         encoder.Encode(plaintextPassword, scale, plaintext);
         return plaintext;
     }
 
-    static Ciphertext EncryptPassword(Encryptor encryptor, Plaintext plaintext)
+    internal static Ciphertext EncryptPassword(Encryptor encryptor, Plaintext plaintext)
     {
         var encryptedPassword = new Ciphertext();
         encryptor.Encrypt(plaintext, encryptedPassword);
         return encryptedPassword;
     }
 
-    static Plaintext DecryptPassword(Decryptor decryptor, Ciphertext encryptedPassword)
+    internal static Plaintext DecryptPassword(Decryptor decryptor, Ciphertext encryptedPassword)
     {
         var decryptedPassword = new Plaintext();
         decryptor.Decrypt(encryptedPassword, decryptedPassword);
         return decryptedPassword;
     }
 
-    static List<double> DecodePassword(CKKSEncoder encoder, Plaintext decryptedPassword, int count)
+    internal static List<double> DecodePassword(CKKSEncoder encoder, Plaintext decryptedPassword, int count)
     {
         var decodedPassword = new List<double>();
         encoder.Decode(decryptedPassword, decodedPassword);
         return decodedPassword.Take(count).Select(x => Math.Round(x)).ToList();
     }
 
-    static void StorePassword(string userId, List<double> plaintextPassword, CKKSEncoder encoder, Encryptor encryptor, double scale)
+    internal static void StorePassword(string userId, List<double> plaintextPassword, CKKSEncoder encoder, Encryptor encryptor, double scale)
     {
         passwordDatabase[userId] = EncryptPassword(encryptor, EncodePassword(encoder, plaintextPassword, scale));
     }
 
-    static bool ValidatePassword(string userId, List<double> inputPassword, CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, double scale)
+    internal static bool ValidatePassword(string userId, List<double> inputPassword, CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, double scale)
     {        
         if (!passwordDatabase.ContainsKey(userId)) 
             return false;
@@ -105,7 +107,7 @@ class Program
             DecodePassword(encoder, dp2, inputPassword.Count));
     }
 
-    static void PasswordManagementExample2(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
+    internal static void PasswordManagementExample2(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
     {
         List<double> password1 = new List<double> { 1, 2, 3, 4, 5, 67, 7, 8, 9, 10 };
         List<double> password2 = new List<double> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -124,7 +126,7 @@ class Program
         Console.WriteLine($"Validation for user1 with incorrect password: {isInvalid}");
     }
 
-    static void PasswordManagementExample(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
+    internal static void PasswordManagementExample(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
     {
         List<double> plaintextPassword = new List<double>
         {
