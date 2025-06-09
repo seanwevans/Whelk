@@ -8,6 +8,11 @@ class Program
 {
     static Dictionary<string, Ciphertext> passwordDatabase = new Dictionary<string, Ciphertext>();
 
+    internal static void ClearPasswordDatabase()
+    {
+        passwordDatabase.Clear();
+    }
+
 #if !EXCLUDE_MAIN
     static void Main(string[] args)
     {
