@@ -6,6 +6,11 @@ using Xunit;
 
 public class PasswordManagementTests
 {
+    private static void ResetDatabase()
+    {
+        Program.ClearPasswordDatabase();
+    }
+
 
     [Fact]
     public void SetupEncryptionParameters_ReturnsExpectedSettings()

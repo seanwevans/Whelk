@@ -1,9 +1,20 @@
 ﻿using System;
 using Microsoft.Research.SEAL;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
+
+class Program
+{
+    static Dictionary<string, Ciphertext> passwordDatabase = new Dictionary<string, Ciphertext>();
+
+    internal static void ClearPasswordDatabase()
+    {
+        passwordDatabase.Clear();
+    }
+
 
 class Program
 {
