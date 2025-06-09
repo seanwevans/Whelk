@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.Research.SEAL;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 
 class Program
 {
@@ -13,6 +15,9 @@ class Program
         passwordDatabase.Clear();
     }
 
+
+class Program
+{
 #if !EXCLUDE_MAIN
     static void Main(string[] args)
     {
@@ -62,68 +67,22 @@ class Program
         return (publicKey, secretKey);
     }
 
-    internal static Plaintext EncodePassword(CKKSEncoder encoder, List<double> plaintextPassword, double scale)
-    {
-        var plaintext = new Plaintext();
-        encoder.Encode(plaintextPassword, scale, plaintext);
-        return plaintext;
-    }
-
-    internal static Ciphertext EncryptPassword(Encryptor encryptor, Plaintext plaintext)
-    {
-        var encryptedPassword = new Ciphertext();
-        encryptor.Encrypt(plaintext, encryptedPassword);
-        return encryptedPassword;
-    }
-
-    internal static Plaintext DecryptPassword(Decryptor decryptor, Ciphertext encryptedPassword)
-    {
-        var decryptedPassword = new Plaintext();
-        decryptor.Decrypt(encryptedPassword, decryptedPassword);
-        return decryptedPassword;
-    }
-
-    internal static List<double> DecodePassword(CKKSEncoder encoder, Plaintext decryptedPassword, int count)
-    {
-        var decodedPassword = new List<double>();
-        encoder.Decode(decryptedPassword, decodedPassword);
-        return decodedPassword.Take(count).Select(x => Math.Round(x)).ToList();
-    }
-
-    internal static void StorePassword(string userId, List<double> plaintextPassword, CKKSEncoder encoder, Encryptor encryptor, double scale)
-    {
-        passwordDatabase[userId] = EncryptPassword(encryptor, EncodePassword(encoder, plaintextPassword, scale));
-    }
-
-    internal static bool ValidatePassword(string userId, List<double> inputPassword, CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, double scale)
-    {        
-        if (!passwordDatabase.ContainsKey(userId)) 
-            return false;
-
-        var ep = EncodePassword(encoder, inputPassword, scale);
-        var xp = EncryptPassword(encryptor, ep);
-
-        var dp1 = DecryptPassword(decryptor, passwordDatabase[userId]);
-        var dp2 = DecryptPassword(decryptor, xp);        
-        
-        return 
-            DecodePassword(encoder, dp1, inputPassword.Count).SequenceEqual(
-            DecodePassword(encoder, dp2, inputPassword.Count));
-    }
 
     internal static void PasswordManagementExample2(CKKSEncoder encoder, Encryptor encryptor, Decryptor decryptor, Evaluator evaluator, double scale)
     {
-        List<double> password1 = new List<double> { 1, 2, 3, 4, 5, 67, 7, 8, 9, 10 };
-        List<double> password2 = new List<double> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        var manager = new PasswordManager(encoder, encryptor, decryptor, scale);
+
+        List<double> password1 = new() { 1, 2, 3, 4, 5, 67, 7, 8, 9, 10 };
+        List<double> password2 = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
         Console.WriteLine("Storing passwords...");
-        StorePassword("user1", password1, encoder, encryptor, scale);
-        StorePassword("user2", password2, encoder, encryptor, scale);
+        manager.StorePassword("user1", password1);
+        manager.StorePassword("user2", password2);
 
         Console.WriteLine("Validating passwords...");
-        bool isValid1 = ValidatePassword("user1", password1, encoder, encryptor, decryptor, scale);
-        bool isValid2 = ValidatePassword("user2", password2, encoder, encryptor, decryptor, scale);
-        bool isInvalid = ValidatePassword("user1", password2, encoder, encryptor, decryptor, scale);
+        bool isValid1 = manager.ValidatePassword("user1", password1);
+        bool isValid2 = manager.ValidatePassword("user2", password2);
+        bool isInvalid = manager.ValidatePassword("user1", password2);
 
         Console.WriteLine($"Validation for user1 with correct password: {isValid1}");
         Console.WriteLine($"Validation for user2 with correct password: {isValid2}");
@@ -148,19 +107,20 @@ class Program
         try
         {
             // Encode
-            var plaintext = EncodePassword(encoder, plaintextPassword, scale);
+            var manager = new PasswordManager(encoder, encryptor, decryptor, scale);
+            var plaintext = manager.EncodePassword(plaintextPassword);
 
             // Encrypt
-            var encryptedPassword = EncryptPassword(encryptor, plaintext);
+            var encryptedPassword = manager.EncryptPassword(plaintext);
 
             // Store or transfer the encrypted password
             //Console.WriteLine($"Encrypted: {encryptedPassword}");
 
             // Decrypt
-            var decryptedPassword = DecryptPassword(decryptor, encryptedPassword);
+            var decryptedPassword = manager.DecryptPassword(encryptedPassword);
 
             // Decode
-            var decodedPassword = DecodePassword(encoder, decryptedPassword, plaintextPassword.Count);
+            var decodedPassword = manager.DecodePassword(decryptedPassword, plaintextPassword.Count);
 
             Console.Write("Decrypted: ");
             var roundedPassword = decodedPassword.Select(n => Math.Round(n)).ToList();
